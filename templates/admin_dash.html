@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Dashboard - Placement Portal</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div id="main">
+        <div id="canvas" class="overflow-auto">
+            <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #134e4a 0%, #0f766e 100%);">
+                <div class="container-fluid">
+                    <span class="navbar-brand"><i class="bi bi-shield-check"></i> Admin Dashboard</span>
+                    <div class="collapse navbar-collapse">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                            </li>
+                        </ul>
+                        <form class="d-flex" action="/admin/search">
+                            <input class="form-control me-2" type="search" placeholder="Search..." name="search" required>
+                            <select class="form-select me-2" name="search_type" style="width: 150px;">
+                                <option value="student">Student</option>
+                                <option value="company">Company</option>
+                            </select>
+                            <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+
+            <div id="content">
+                <!-- Summary Stats Cards -->
+                <div class="row text-center my-4 g-3 justify-content-center">
+                    <div class="col-6 col-md-2">
+                        <div class="card bg-success text-white h-100">
+                            <div class="card-body">
+                                <i class="bi bi-people" style="font-size: 2rem;"></i>
+                                <h3>{{all_students|length}}</h3>
+                                <p class="mb-0">Students</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card bg-primary text-white h-100">
+                            <div class="card-body">
+                                <i class="bi bi-building" style="font-size: 2rem;"></i>
+                                <h3>{{all_companies|length}}</h3>
+                                <p class="mb-0">Companies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card bg-info text-white h-100">
+                            <div class="card-body">
+                                <i class="bi bi-briefcase" style="font-size: 2rem;"></i>
+                                <h3>{{all_drives|length}}</h3>
+                                <p class="mb-0">Drives</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card bg-warning text-dark h-100">
+                            <div class="card-body">
+                                <i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>
+                                <h3>{{all_applications|length}}</h3>
+                                <p class="mb-0">Applications</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card bg-secondary text-white h-100">
+                            <div class="card-body">
+                                <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                                <h3>{{closed_drives|length}}</h3>
+                                <p class="mb-0">Closed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card text-white h-100" style="background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);">
+                            <div class="card-body">
+                                <i class="bi bi-trophy" style="font-size: 2rem;"></i>
+                                <h3>{{placed_count}}</h3>
+                                <p class="mb-0">Placed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="headings"><i class="bi bi-building"></i> All Companies ({{all_companies|length}})</h3>
+                <div class="table border" style="max-height:200px;overflow-y: scroll;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Company Name</th>
+                                <th>Industry</th>
+                                <th>Approval</th>
+                                <th>Account</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for company in all_companies %}
+                            <tr>
+                                <td>{{company.id}}</td>
+                                <td>{{company.company_name}}</td>
+                                <td>{{company.industry}}</td>
+                                <td>
+                                    {% if company.approval_status == "pending" %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif company.approval_status == "approved" %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if company.user_account.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Blacklisted</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="/view_company/{{company.id}}" class="btn btn-outline-primary btn-sm">View</a>
+                                    {% if company.approval_status == "pending" %}
+                                        <a href="/admin/approve_company/{{company.id}}" class="btn btn-success btn-sm">Approve</a>
+                                        <a href="/admin/reject_company/{{company.id}}" class="btn btn-danger btn-sm">Reject</a>
+                                    {% endif %}
+                                    {% if company.user_account.is_active %}
+                                        <a href="/admin/blacklist_company/{{company.id}}" class="btn btn-secondary btn-sm">Blacklist</a>
+                                    {% else %}
+                                        <a href="/admin/activate_company/{{company.id}}" class="btn btn-info btn-sm">Activate</a>
+                                    {% endif %}
+                                    <a href="/admin/delete_company/{{company.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this company?')">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if all_companies|length == 0 %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No companies registered yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="headings"><i class="bi bi-briefcase"></i> All Placement Drives ({{all_drives|length}})</h3>
+                <div class="table border" style="max-height:200px;overflow-y: scroll;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>CTC</th>
+                                <th>Drive Date</th>
+                                <th>Approval</th>
+                                <th>Drive Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for drive in all_drives %}
+                            <tr>
+                                <td>{{drive.id}}</td>
+                                <td>{{drive.job_title}}</td>
+                                <td>{{drive.company_details.company_name}}</td>
+                                <td>{{drive.ctc}}</td>
+                                <td>{{drive.drive_date}}</td>
+                                <td>
+                                    {% if drive.approval_status == "pending" %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif drive.approval_status == "approved" %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if drive.drive_status == "upcoming" %}
+                                        <span class="badge bg-info">Upcoming</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Closed</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if drive.approval_status == "pending" %}
+                                        <a href="/admin/approve_drive/{{drive.id}}" class="btn btn-success btn-sm">Approve</a>
+                                        <a href="/admin/reject_drive/{{drive.id}}" class="btn btn-danger btn-sm">Reject</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if all_drives|length == 0 %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">No placement drives created yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="headings"><i class="bi bi-people"></i> All Students ({{all_students|length}})</h3>
+                <div class="table border" style="max-height:200px;overflow-y: scroll;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>Branch</th>
+                                <th>CGPA</th>
+                                <th>Phone</th>
+                                <th>Account</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in all_students %}
+                            <tr>
+                                <td>{{student.id}}</td>
+                                <td>{{student.full_name}}</td>
+                                <td>{{student.roll_number}}</td>
+                                <td>{{student.branch}}</td>
+                                <td>{{student.cgpa}}</td>
+                                <td>{{student.phone}}</td>
+                                <td>
+                                    {% if student.user_account.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Blacklisted</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="/view_student/{{student.id}}" class="btn btn-outline-primary btn-sm">View</a>
+                                    {% if student.user_account.is_active %}
+                                        <a href="/admin/blacklist_student/{{student.id}}" class="btn btn-secondary btn-sm">Blacklist</a>
+                                    {% else %}
+                                        <a href="/admin/activate_student/{{student.id}}" class="btn btn-info btn-sm">Activate</a>
+                                    {% endif %}
+                                    <a href="/admin/delete_student/{{student.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if all_students|length == 0 %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">No students registered yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="headings"><i class="bi bi-file-earmark-text"></i> All Applications ({{all_applications|length}})</h3>
+                <div class="table border" style="max-height:200px;overflow-y: scroll;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Student</th>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in all_applications %}
+                            <tr>
+                                <td>{{app.id}}</td>
+                                <td>{{app.student_details.full_name}}</td>
+                                <td>{{app.drive_details.job_title}}</td>
+                                <td>{{app.drive_details.company_details.company_name}}</td>
+                                <td>
+                                    {% if app.status == "applied" %}
+                                        <span class="badge bg-primary">Applied</span>
+                                    {% elif app.status == "shortlisted" %}
+                                        <span class="badge bg-info">Shortlisted</span>
+                                    {% elif app.status == "interview" %}
+                                        <span class="badge bg-warning">Interview</span>
+                                    {% elif app.status == "selected" %}
+                                        <span class="badge bg-success">Placed</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{app.application_date}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% if all_applications|length == 0 %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No applications submitted yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="headings"><i class="bi bi-trophy"></i> Placement History - Students Placed ({{selected_applications|length}})</h3>
+                <div class="table border" style="max-height:250px;overflow-y: scroll;">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Roll Number</th>
+                                <th>Branch</th>
+                                <th>Company</th>
+                                <th>Job Title</th>
+                                <th>CTC</th>
+                                <th>Drive Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in selected_applications %}
+                            <tr>
+                                <td>{{app.student_details.full_name}}</td>
+                                <td>{{app.student_details.roll_number}}</td>
+                                <td>{{app.student_details.branch}}</td>
+                                <td>{{app.drive_details.company_details.company_name}}</td>
+                                <td>{{app.drive_details.job_title}}</td>
+                                <td>{{app.drive_details.ctc}}</td>
+                                <td>{{app.drive_details.drive_date}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% if selected_applications|length == 0 %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No placements yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="headings"><i class="bi bi-check-circle"></i> Closed Drives Summary ({{closed_drives|length}})</h3>
+                <div class="table border" style="max-height:200px;overflow-y: scroll;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Job Title</th>
+                                <th>CTC</th>
+                                <th>Drive Date</th>
+                                <th>Positions</th>
+                                <th>Applications</th>
+                                <th>Selected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for drive in closed_drives %}
+                            <tr>
+                                <td>{{drive.company_details.company_name}}</td>
+                                <td>{{drive.job_title}}</td>
+                                <td>{{drive.ctc}}</td>
+                                <td>{{drive.drive_date}}</td>
+                                <td>{{drive.max_positions}}</td>
+                                <td>{{drive.applications|length}}</td>
+                                <td>
+                                    {% set selected_count = drive.applications|selectattr('status', 'equalto', 'selected')|list|length %}
+                                    <span class="badge bg-success">{{selected_count}}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if closed_drives|length == 0 %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No closed drives yet</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
