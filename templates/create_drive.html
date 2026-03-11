@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create Drive</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div id="main">
+        <div id="canvas">
+            <div id="form-body" style="height: auto; padding: 20px;">
+                <h1>Create a Drive</h1>
+                <form action="/company/create_drive/{{user_id}}" method="post">
+                <div class="mb-3">
+                    <label for="job_title" class="form-label">Job Title</label>
+                    <input type="text" class="form-control" name="job_title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="job_description" class="form-label">Job Description</label>
+                    <textarea class="form-control" name="job_description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="eligibility_criteria" class="form-label">Eligibility Criteria</label>
+                    <textarea class="form-control" name="eligibility_criteria" rows="2" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="required_skills" class="form-label">Required Skills (comma separated)</label>
+                    <input type="text" class="form-control" name="required_skills" placeholder="Python, SQL, Communication">
+                </div>
+                <div class="mb-3">
+                    <label for="experience" class="form-label">Experience Required</label>
+                    <input type="text" class="form-control" name="experience" placeholder="Fresher / 1-2 years">
+                </div>
+                <div class="mb-3">
+                    <label for="required_cgpa" class="form-label">Required CGPA</label>
+                    <input type="number" step="0.01" class="form-control" name="required_cgpa" required>
+                </div>
+                <div class="mb-3">
+                    <label for="eligible_branches" class="form-label">Eligible Branches (comma separated)</label>
+                    <input type="text" class="form-control" name="eligible_branches" placeholder="CSE, ECE, EE" required>
+                </div>
+                <div class="mb-3">
+                    <label for="ctc" class="form-label">CTC</label>
+                    <input type="text" class="form-control" name="ctc" placeholder="10 LPA" required>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" name="location" required>
+                </div>
+                <div class="mb-3">
+                    <label for="drive_date" class="form-label">Drive Date</label>
+                    <input type="date" class="form-control" name="drive_date" required>
+                </div>
+                <div class="mb-3">
+                    <label for="application_deadline" class="form-label">Application Deadline</label>
+                    <input type="date" class="form-control" name="application_deadline" required>
+                </div>
+                <div class="mb-3">
+                    <label for="max_positions" class="form-label">Maximum Positions</label>
+                    <input type="number" class="form-control" name="max_positions" required>
+                </div>
+                <div style="text-align: center;">
+                <input type="submit" class="btn btn-success" value="Create"> 
+                <a href="/company/{{user_id}}" class="btn btn-secondary">Cancel</a>
+               </div>
+               </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
